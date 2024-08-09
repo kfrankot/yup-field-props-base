@@ -21,4 +21,4 @@ export default {
       statements: 95,
     },
   },
-};
+}

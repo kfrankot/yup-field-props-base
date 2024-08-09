@@ -1,0 +1,1 @@
+export { getValidationExtractionFuncByType } from './getExtractorFunc'

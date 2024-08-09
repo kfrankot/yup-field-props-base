@@ -1,0 +1,1 @@
+export { useYupFieldDescription } from './useFieldDescription'
