@@ -4,7 +4,7 @@
 import React, { ReactNode } from 'react'
 import { renderHook } from '@testing-library/react'
 import { object, string, number, boolean, date, mixed, array } from 'yup'
-import { useYupFieldProps, YupSchemaProvider } from './react'
+import { useYupFieldProps, YupSchemaProvider } from '.'
 
 describe('useYupFieldProps', () => {
   const schema = object({

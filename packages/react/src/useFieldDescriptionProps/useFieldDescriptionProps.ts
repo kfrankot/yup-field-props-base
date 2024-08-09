@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { AllFieldProps, FieldProps } from '../../types'
+import { AllFieldProps, FieldProps } from '../../../core/src/types'
 import { useYupFieldDescription } from '../useFieldDescription'
-import { getPropsFromFieldDescription } from '../../getSchemaProps'
+import { getPropsFromFieldDescription } from '../../../core/src/getSchemaProps'
 
 export const useYupFieldProps = <T extends FieldProps = AllFieldProps>(
   name: string,
