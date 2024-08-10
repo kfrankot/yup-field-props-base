@@ -1,4 +1,4 @@
-import { AnySchema, SchemaDescription } from 'yup'
+import { SchemaDescription } from 'yup'
 
 export type FieldProps = {
   type?: string
@@ -29,8 +29,8 @@ export type DateFieldProps = FieldProps & {
   max?: Date
 }
 
-export type ArrayFieldProps = FieldProps & {
-  of?: AnySchema
+export type ArrayFieldProps<Of extends FieldProps = FieldProps> = FieldProps & {
+  of?: Of
   min?: number
   max?: number
   length?: number
