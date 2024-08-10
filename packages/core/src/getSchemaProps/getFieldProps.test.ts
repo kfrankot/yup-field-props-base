@@ -101,7 +101,6 @@ describe('getFieldProps', () => {
       nullable: false,
       oneOf: [],
       notOneOf: [],
-      default: undefined,
       min: 3,
       max: 50,
       length: 10,
@@ -155,7 +154,6 @@ describe('getFieldProps', () => {
       nullable: true,
       oneOf: [],
       notOneOf: [],
-      default: undefined,
       lessThan: 70,
       moreThan: 10,
       description: expect.any(Object),
@@ -176,7 +174,6 @@ describe('getFieldProps', () => {
       nullable: false,
       oneOf: [],
       notOneOf: [],
-      default: undefined,
       min: new Date('2000-01-01'),
       max: new Date('2020-12-31'),
       customTest: true,
@@ -198,7 +195,6 @@ describe('getFieldProps', () => {
       nullable: false,
       oneOf: [],
       notOneOf: [],
-      default: undefined,
       min: 1,
       max: 5,
       length: 2,
@@ -209,7 +205,6 @@ describe('getFieldProps', () => {
         nullable: false,
         oneOf: [],
         notOneOf: [],
-        default: undefined,
         description: expect.any(Object),
         tests: expect.any(Array),
         of: {
@@ -218,7 +213,6 @@ describe('getFieldProps', () => {
           nullable: false,
           oneOf: [],
           notOneOf: [],
-          default: undefined,
           description: expect.any(Object),
           tests: expect.any(Array),
         },
@@ -260,7 +254,6 @@ describe('getFieldProps', () => {
       nullable: false,
       oneOf: ['one', 'two', 'three'],
       notOneOf: [],
-      default: undefined,
       description: expect.any(Object),
       tests: expect.any(Array),
     })
@@ -279,7 +272,6 @@ describe('getFieldProps', () => {
       nullable: false,
       oneOf: [],
       notOneOf: ['four', 'five', 'six'],
-      default: undefined,
       description: expect.any(Object),
       tests: expect.any(Array),
     })
@@ -298,7 +290,6 @@ describe('getFieldProps', () => {
       nullable: false,
       oneOf: [],
       notOneOf: [],
-      default: undefined,
       description: expect.any(Object),
       tests: expect.any(Array),
     })
@@ -317,7 +308,6 @@ describe('getFieldProps', () => {
       nullable: false,
       oneOf: [],
       notOneOf: [],
-      default: undefined,
       description: expect.any(Object),
       tests: expect.any(Array),
     }
@@ -356,7 +346,6 @@ describe('getFieldProps', () => {
       nullable: false,
       oneOf: [],
       notOneOf: [],
-      default: undefined,
       description: expect.any(Object),
       tests: expect.any(Array),
     })
@@ -374,7 +363,6 @@ describe('getFieldProps', () => {
       nullable: false,
       oneOf: [],
       notOneOf: [],
-      default: undefined,
       description: expect.any(Object),
       tests: expect.any(Array),
     })

@@ -5,3 +5,4 @@ export {
   useYupSchemaContext,
   YupSchemaProviderProps,
 } from './YupSchemaProvider'
+export * from '../../core/src/types'

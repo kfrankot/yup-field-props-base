@@ -1,14 +1,14 @@
 import { SchemaDescription } from 'yup'
 
 export type FieldProps = {
-  type?: string
-  required?: boolean
-  nullable?: boolean
-  oneOf?: any[]
-  notOneOf?: any[]
+  type: string
+  required: boolean
+  nullable: boolean
+  oneOf: any[]
+  notOneOf: any[]
   default?: any
-  description?: SchemaDescription
-  tests?: {
+  description: SchemaDescription
+  tests: {
     name?: string
     params: Record<string, unknown> | undefined
   }[]

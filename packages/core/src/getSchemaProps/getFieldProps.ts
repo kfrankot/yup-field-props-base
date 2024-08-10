@@ -28,20 +28,20 @@ export const getPropsFromFieldDescription = <
     description: fieldDescription,
     tests: fieldDescription.tests,
   }
+  if (fieldProps.default === undefined) {
+    delete fieldProps.default
+  }
 
   const validatorExtractionFunc = getValidationExtractionFuncByType(type)
 
   if (!validatorExtractionFunc) return fieldProps
 
-  // FIXME: There is no reason I shouldn't try and pickup props on custom tests
-  // Test using precision custom validator for an example, and it should be fine
-  // as users can provide their own types
   const customTests: SchemaDescription['tests'] = []
   fieldDescription.tests.forEach((test) => {
     if (!isValidTest(test)) return
     const newProps = validatorExtractionFunc(test)
     Object.assign(fieldProps, newProps)
-    if(Object.keys(newProps).length === 0 ) {
+    if (Object.keys(newProps).length === 0) {
       customTests.push(test)
     }
   })
@@ -49,10 +49,10 @@ export const getPropsFromFieldDescription = <
   // Assign custom tests as long as they don't collide with other props,
   // and default params to true to match behavior of known validators
   customTests.forEach((test) => {
-    if(Object.hasOwn(fieldProps, test.name || '')) {
+    if (Object.hasOwn(fieldProps, test.name || '')) {
       return
     }
-    Object.assign(fieldProps, {[test.name || '']: test.params ?? true})
+    Object.assign(fieldProps, { [test.name || '']: test.params ?? true })
   })
 
   if (type === 'array') {

@@ -1,4 +1,10 @@
-import React, { useContext, createContext, useMemo, useRef, ReactNode } from 'react'
+import React, {
+  useContext,
+  createContext,
+  useMemo,
+  useRef,
+  ReactNode,
+} from 'react'
 import { AnyObject, ObjectSchema, SchemaObjectDescription } from 'yup'
 import fastDeepEqual from 'fast-deep-equal/es6'
 
@@ -32,7 +38,11 @@ export const YupSchemaProvider = ({
 
   // TODO: Need to verify performance improvement
   const contextRef = useRef(context)
-  if (disableDeepEqualCheck || (contextRef.current !== context && !fastDeepEqual(contextRef.current, context))) {
+  if (
+    disableDeepEqualCheck ||
+    (contextRef.current !== context &&
+      !fastDeepEqual(contextRef.current, context))
+  ) {
     contextRef.current = context
   }
 
