@@ -1,5 +1,5 @@
 {
-  "name": "@yup-schema-props/react",
+  "name": "@yup-field-props/react",
   "version": "1.0.0-alpha.1",
   "description": "An npm package to share and batch setInterval calls with the same delay",
   "files": [
