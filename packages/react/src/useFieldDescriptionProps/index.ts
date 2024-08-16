@@ -1,1 +1,0 @@
-export { useYupFieldProps } from './useFieldDescriptionProps'

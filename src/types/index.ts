@@ -37,6 +37,20 @@ export type ArrayFieldProps<Of extends FieldProps = FieldProps> = FieldProps & {
   ensure?: boolean
 }
 
+export type StringFieldProps = FieldProps & {
+  min?: number
+  max?: number
+  length?: number
+  matches?: RegExp
+  email?: boolean
+  url?: boolean
+  uuid?: boolean
+  datetime?: boolean
+  datetimeAllowOffset?: boolean
+  datetimePrecision?: number
+}
+
+
 export type AllFieldProps = MixedFieldProps &
   NumberFieldProps &
   DateFieldProps &
