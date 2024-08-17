@@ -15,6 +15,7 @@ export default [
       file: 'dist/index.js',
       format: 'es',
     },
+    external: ['yup', 'lodash/get'],
     plugins: [
       license({
         banner,

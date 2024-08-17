@@ -1,14 +1,14 @@
 {
   "name": "@yup-field-props/base",
   "version": "1.0.0-alpha.1",
-  "description": "An npm package to share and batch setInterval calls with the same delay",
+  "description": "Get the validation properties for a field in a yup schema",
   "files": [
     "dist/"
   ],
   "type": "module",
-  "main": "src/index.ts",
-  "module": "src/index.ts",
-  "types": "src/index.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest --runInBand",
     "test:watch": "npm run test -- --watch",
@@ -30,9 +30,6 @@
   },
   "author": "Kevin Frankot",
   "license": "MIT",
-  "bugs": {
-    "url": ""
-  },
   "homepage": "",
   "devDependencies": {
     "@babel/plugin-transform-nullish-coalescing-operator": "^7.24.7",
