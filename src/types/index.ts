@@ -50,7 +50,6 @@ export type StringFieldProps = FieldProps & {
   datetimePrecision?: number
 }
 
-
 export type AllFieldProps = MixedFieldProps &
   NumberFieldProps &
   DateFieldProps &

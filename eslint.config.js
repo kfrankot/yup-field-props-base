@@ -4,6 +4,7 @@ import tsPlugin from '@typescript-eslint/eslint-plugin'
 import prettier from 'eslint-config-prettier'
 import prettierPlugin from 'eslint-plugin-prettier'
 import jest from 'eslint-plugin-jest'
+import globals from 'globals'
 
 const ignores = [
   '**/node_modules/**',
@@ -32,6 +33,9 @@ export default [
         ecmaVersion: 'latest',
         sourceType: 'module',
         project: './tsconfig.json',
+      },
+      globals: {
+        ...globals.browser,
       },
     },
     plugins: {

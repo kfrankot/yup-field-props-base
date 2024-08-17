@@ -1,10 +1,6 @@
 export {
-  getFieldDescriptionFromName,
-  getFieldDescriptionFromPath,
-  getFieldDescriptionPathFromName,
+  getFieldPathsFromName,
+  getFieldDescription,
+  getFieldDescriptionFromPaths,
 } from './getFieldDescription'
-export {
-  getPropsFromFieldDescription,
-  getPropsFromFieldNameAndSchemaDescription,
-  getPropsFromFieldPathAndSchemaDescription,
-} from './getFieldProps'
+export { getFieldPropsFromDescription, getFieldProps } from './getFieldProps'

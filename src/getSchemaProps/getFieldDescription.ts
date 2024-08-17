@@ -1,23 +1,66 @@
-import { SchemaDescription, SchemaObjectDescription } from 'yup'
+import { AnyObject, ObjectSchema, reach } from 'yup'
 import { get } from 'lodash'
+import { throwOrReturn } from '../utils'
 
-export const getFieldDescriptionPathFromName = (name: string) => {
-  return name.split('.').join('.fields.')
+export const getFieldPathsFromName = (name: string) => {
+  const parts = name.split('.')
+  const parentPath = parts.slice(0, parts.length - 1).join('.')
+  const valuePath = parts[parts.length - 1]
+  return { valuePath, parentPath }
 }
 
-export const getFieldDescriptionFromPath = (
-  path: string,
-  description: SchemaObjectDescription,
-) => {
-  return get(description?.fields, path, null) as SchemaDescription | null
+export const getFieldDescription = ({
+  name,
+  schema,
+  values,
+  context,
+  throwError = false,
+}: {
+  name: string
+  schema: ObjectSchema<any, AnyObject, any, ''>
+  values: AnyObject
+  context?: any
+  throwError?: boolean
+}) => {
+  try {
+    const { valuePath, parentPath } = getFieldPathsFromName(name)
+    const parent = parentPath ? get(values, parentPath) : values
+    const value = get(parent, valuePath)
+
+    const fieldSchema = reach(schema, name, values, context)
+    return fieldSchema.describe({ value, parent, context })
+  } catch (error) {
+    return throwOrReturn(error, throwError, null)
+  }
 }
 
-export const getFieldDescriptionFromName = (
-  name: string,
-  description: SchemaObjectDescription,
-) => {
-  return getFieldDescriptionFromPath(
-    getFieldDescriptionPathFromName(name),
-    description,
-  )
+export const getFieldDescriptionFromPaths = ({
+  valuePath,
+  parentPath,
+  schema,
+  values,
+  context,
+  throwError = false,
+}: {
+  valuePath: string
+  parentPath: string
+  schema: ObjectSchema<any, AnyObject, any, ''>
+  values: AnyObject
+  context?: any
+  throwError?: boolean
+}) => {
+  try {
+    const parent = parentPath ? get(values, parentPath) : values
+    const value = get(parent, valuePath)
+
+    const fieldSchema = reach(
+      schema,
+      parentPath ? parentPath + '.' + valuePath : valuePath,
+      values,
+      context,
+    )
+    return fieldSchema.describe({ value, parent, context })
+  } catch (error) {
+    return throwOrReturn(error, throwError, null)
+  }
 }

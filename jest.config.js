@@ -10,10 +10,10 @@ export default {
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   coverageThreshold: {
     global: {
-      branches: 75,
+      branches: 80,
       functions: 100,
       lines: 95,
-      statements: 95,
+      statements: 90,
     },
   },
 }

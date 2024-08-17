@@ -1,21 +1,16 @@
-import { object, string, number, boolean, date, array } from 'yup'
-import {
-  getFieldDescriptionFromName,
-  getPropsFromFieldDescription,
-  getPropsFromFieldPathAndSchemaDescription,
-  getPropsFromFieldNameAndSchemaDescription,
-} from '.'
-
-// add custom validator to yup for a number's decimal precision
+import * as yup from 'yup'
+import { getFieldPropsFromDescription, getFieldProps } from './getFieldProps'
+import { getFieldDescription } from './getFieldDescription'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare module 'yup' {
   interface NumberSchema {
     precision(precision: number): NumberSchema
+    isMidpoint(midpoint: number): NumberSchema
   }
 }
 
-number.prototype.precision = function (this: any, precision: number) {
+yup.number.prototype.precision = function (this: any, precision: number) {
   return this.test({
     name: 'precision',
     exclusive: true,
@@ -29,10 +24,24 @@ number.prototype.precision = function (this: any, precision: number) {
   })
 }
 
-describe('getFieldProps', () => {
+yup.number.prototype.isMidpoint = function (this: any, midpoint: number) {
+  return this.test({
+    name: 'isMidpoint',
+    exclusive: true,
+    message: `\${path} must be the midpoint of ${midpoint}`,
+    test: (value: number) => {
+      if (typeof value !== 'number') return true
+      return value * 2 === midpoint
+    },
+    params: { midpoint },
+  })
+}
+
+describe('getFieldPropsFromDescription', () => {
   const customTest = ['customTest', () => true] as const
-  const schema = object({
-    name: string()
+  const schema = yup.object().shape({
+    name: yup
+      .string()
       .required()
       .min(3)
       .max(50)
@@ -43,35 +52,52 @@ describe('getFieldProps', () => {
       .uuid()
       .datetime({ allowOffset: true, precision: 2 })
       .test(...customTest),
-    age: number()
+    age: yup
+      .number()
       .required()
       .min(18)
       .max(65)
       .integer()
       .default(30)
       .precision(2)
+      .isMidpoint(30)
       .test(...customTest),
-    ageExclusive: number().nullable().lessThan(70).moreThan(10),
-    birthdate: date()
+    ageExlusive: yup.number().moreThan(18).lessThan(65),
+    birthdate: yup
+      .date()
       .required()
       .min(new Date('2000-01-01'))
       .max(new Date('2020-12-31'))
       .test(...customTest),
-    tags: array()
-      .of(array().of(string().required()).required())
+    tags: yup
+      .array()
+      .of(yup.array().of(yup.string().required()).required())
       .min(1)
       .max(5)
       .length(2)
       .test(...customTest),
-    confirmed: boolean().required().default(false),
-    oneOf: string().oneOf(['one', 'two', 'three']),
-    notOneOf: string().notOneOf(['four', 'five', 'six']),
-    nested: object({
-      nestedString: string().required(),
+    confirmed: yup.boolean().required().default(false),
+    oneOf: yup.string().oneOf(['one', 'two', 'three']),
+    notOneOf: yup.string().notOneOf([yup.ref('name'), 'five', 'six']),
+    nested: yup.object({
+      nestedString: yup.string().required(),
+      nestedNumber: yup.number().required(),
+      nestedRef: yup
+        .string()
+        .min(yup.ref('age'))
+        .max(yup.ref('nestedNumber'))
+        .length(yup.ref('$someContext')),
     }),
-    conditional: string().when('nested.nestedString', ([nestedString]) => {
-      return nestedString === 'foo' ? string().required() : string()
+    conditional: yup.string().when('nested.nestedString', ([nestedString]) => {
+      return nestedString === 'foo' ? yup.string().required() : yup.string()
     }),
+    otherNumber: yup.number(),
+    refTest: yup
+      .string()
+      .min(yup.ref('age'))
+      .max(yup.ref('otherNumber'))
+      .length(yup.ref('$someContext')),
+    oneOfRef: yup.string().oneOf([yup.ref('name'), 'bla']),
   })
 
   const defaultValues = {
@@ -84,16 +110,26 @@ describe('getFieldProps', () => {
     notOneOf: 'four',
     nested: {
       nestedString: 'nested',
+      nestedNumber: 60,
+      nestedRef: 'nested',
     },
     conditional: '',
+    otherNumber: 50,
+    refTest: 'refTest',
   }
 
   it('returns the correct field properties for a string field', () => {
-    const description = getFieldDescriptionFromName(
-      'name',
-      schema.describe({ value: defaultValues }),
-    )
-    const result = getPropsFromFieldDescription(description)
+    const description = getFieldDescription({
+      name: 'name',
+      schema,
+      values: defaultValues,
+    }) as yup.SchemaDescription
+    const result = getFieldPropsFromDescription({
+      name: 'name',
+      fieldDescription: description,
+      values: defaultValues,
+      context: {},
+    })
 
     expect(result).toStrictEqual({
       type: 'string',
@@ -101,28 +137,34 @@ describe('getFieldProps', () => {
       nullable: false,
       oneOf: [],
       notOneOf: [],
-      min: 3,
-      max: 50,
-      length: 10,
-      matches: /^[a-zA-Z]+$/,
-      email: true,
-      url: true,
-      uuid: true,
+      customTest: true,
       datetime: true,
       datetimeAllowOffset: true,
       datetimePrecision: 2,
-      customTest: true,
+      email: true,
+      length: 10,
+      matches: /^[a-zA-Z]+$/,
+      max: 50,
+      min: 3,
+      url: true,
+      uuid: true,
       description: expect.any(Object),
       tests: expect.any(Array),
     })
   })
 
   it('returns the correct field properties for a number field', () => {
-    const description = getFieldDescriptionFromName(
-      'age',
-      schema.describe({ value: defaultValues }),
-    )
-    const result = getPropsFromFieldDescription(description)
+    const description = getFieldDescription({
+      name: 'age',
+      schema,
+      values: defaultValues,
+    }) as yup.SchemaDescription
+    const result = getFieldPropsFromDescription({
+      name: 'age',
+      fieldDescription: description,
+      values: defaultValues,
+      context: {},
+    })
 
     expect(result).toStrictEqual({
       type: 'number',
@@ -131,42 +173,80 @@ describe('getFieldProps', () => {
       oneOf: [],
       notOneOf: [],
       default: 30,
-      min: 18,
-      max: 65,
-      integer: true,
       customTest: true,
+      max: 65,
+      min: 18,
+      integer: true,
       precision: 2,
+      isMidpoint: { midpoint: 30 },
       description: expect.any(Object),
       tests: expect.any(Array),
     })
   })
 
-  it('returns the correct field properties for a number with exclusive ranges', () => {
-    const description = getFieldDescriptionFromName(
-      'ageExclusive',
-      schema.describe({ value: defaultValues }),
-    )
-    const result = getPropsFromFieldDescription(description)
+  it('returns the correct field properties for a number field with exclusive tests', () => {
+    const description = getFieldDescription({
+      name: 'ageExlusive',
+      schema,
+      values: defaultValues,
+    }) as yup.SchemaDescription
+    const result = getFieldPropsFromDescription({
+      name: 'ageExlusive',
+      fieldDescription: description,
+      values: defaultValues,
+      context: {},
+    })
 
     expect(result).toStrictEqual({
       type: 'number',
       required: false,
-      nullable: true,
+      nullable: false,
       oneOf: [],
       notOneOf: [],
-      lessThan: 70,
-      moreThan: 10,
+      moreThan: 18,
+      lessThan: 65,
+      description: expect.any(Object),
+      tests: expect.any(Array),
+    })
+  })
+
+  it('returns the correct field properties for a boolean field', () => {
+    const description = getFieldDescription({
+      name: 'confirmed',
+      schema,
+      values: defaultValues,
+    }) as yup.SchemaDescription
+    const result = getFieldPropsFromDescription({
+      name: 'confirmed',
+      fieldDescription: description,
+      values: defaultValues,
+      context: {},
+    })
+
+    expect(result).toStrictEqual({
+      type: 'boolean',
+      required: true,
+      nullable: false,
+      oneOf: [],
+      notOneOf: [],
+      default: false,
       description: expect.any(Object),
       tests: expect.any(Array),
     })
   })
 
   it('returns the correct field properties for a date field', () => {
-    const description = getFieldDescriptionFromName(
-      'birthdate',
-      schema.describe({ value: defaultValues }),
-    )
-    const result = getPropsFromFieldDescription(description)
+    const description = getFieldDescription({
+      name: 'birthdate',
+      schema,
+      values: defaultValues,
+    }) as yup.SchemaDescription
+    const result = getFieldPropsFromDescription({
+      name: 'birthdate',
+      fieldDescription: description,
+      values: defaultValues,
+      context: {},
+    })
 
     expect(result).toStrictEqual({
       type: 'date',
@@ -174,20 +254,26 @@ describe('getFieldProps', () => {
       nullable: false,
       oneOf: [],
       notOneOf: [],
-      min: new Date('2000-01-01'),
-      max: new Date('2020-12-31'),
       customTest: true,
+      max: new Date('2020-12-31'),
+      min: new Date('2000-01-01'),
       description: expect.any(Object),
       tests: expect.any(Array),
     })
   })
 
   it('returns the correct field properties for an array field', () => {
-    const description = getFieldDescriptionFromName(
-      'tags',
-      schema.describe({ value: defaultValues }),
-    )
-    const result = getPropsFromFieldDescription(description)
+    const description = getFieldDescription({
+      name: 'tags',
+      schema,
+      values: defaultValues,
+    }) as yup.SchemaDescription
+    const result = getFieldPropsFromDescription({
+      name: 'tags',
+      fieldDescription: description,
+      values: defaultValues,
+      context: {},
+    })
 
     expect(result).toStrictEqual({
       type: 'array',
@@ -195,10 +281,12 @@ describe('getFieldProps', () => {
       nullable: false,
       oneOf: [],
       notOneOf: [],
-      min: 1,
-      max: 5,
       length: 2,
+      max: 5,
+      min: 1,
       customTest: true,
+      description: expect.any(Object),
+      tests: expect.any(Array),
       of: {
         type: 'array',
         required: true,
@@ -217,72 +305,21 @@ describe('getFieldProps', () => {
           tests: expect.any(Array),
         },
       },
-      description: expect.any(Object),
-      tests: expect.any(Array),
-    })
-  })
-
-  it('returns the correct field properties for a boolean field', () => {
-    const description = getFieldDescriptionFromName(
-      'confirmed',
-      schema.describe({ value: defaultValues }),
-    )
-    const result = getPropsFromFieldDescription(description)
-
-    expect(result).toStrictEqual({
-      type: 'boolean',
-      required: true,
-      nullable: false,
-      oneOf: [],
-      notOneOf: [],
-      default: false,
-      description: expect.any(Object),
-      tests: expect.any(Array),
-    })
-  })
-
-  it('returns the correct field properties for a oneOf field', () => {
-    const description = getFieldDescriptionFromName(
-      'oneOf',
-      schema.describe({ value: defaultValues }),
-    )
-    const result = getPropsFromFieldDescription(description)
-
-    expect(result).toStrictEqual({
-      type: 'string',
-      required: false,
-      nullable: false,
-      oneOf: ['one', 'two', 'three'],
-      notOneOf: [],
-      description: expect.any(Object),
-      tests: expect.any(Array),
-    })
-  })
-
-  it('returns the correct field properties for a notOneOf field', () => {
-    const description = getFieldDescriptionFromName(
-      'notOneOf',
-      schema.describe({ value: defaultValues }),
-    )
-    const result = getPropsFromFieldDescription(description)
-
-    expect(result).toStrictEqual({
-      type: 'string',
-      required: false,
-      nullable: false,
-      oneOf: [],
-      notOneOf: ['four', 'five', 'six'],
-      description: expect.any(Object),
-      tests: expect.any(Array),
     })
   })
 
   it('returns the correct field properties for a nested field', () => {
-    const description = getFieldDescriptionFromName(
-      'nested.nestedString',
-      schema.describe({ value: defaultValues }),
-    )
-    const result = getPropsFromFieldDescription(description)
+    const description = getFieldDescription({
+      name: 'nested.nestedString',
+      schema,
+      values: defaultValues,
+    }) as yup.SchemaDescription
+    const result = getFieldPropsFromDescription({
+      name: 'nested.nestedString',
+      fieldDescription: description,
+      values: defaultValues,
+      context: {},
+    })
 
     expect(result).toStrictEqual({
       type: 'string',
@@ -296,11 +333,17 @@ describe('getFieldProps', () => {
   })
 
   it('returns the correct field properties for a conditional field', () => {
-    const description = getFieldDescriptionFromName(
-      'conditional',
-      schema.describe({ value: defaultValues }),
-    )
-    const result = getPropsFromFieldDescription(description)
+    const description = getFieldDescription({
+      name: 'conditional',
+      schema,
+      values: defaultValues,
+    }) as yup.SchemaDescription
+    const result = getFieldPropsFromDescription({
+      name: 'conditional',
+      fieldDescription: description,
+      values: defaultValues,
+      context: {},
+    })
 
     const toEqual = {
       type: 'string',
@@ -314,13 +357,17 @@ describe('getFieldProps', () => {
 
     expect(result).toStrictEqual(toEqual)
 
-    const description2 = getFieldDescriptionFromName(
-      'conditional',
-      schema.describe({
-        value: { ...defaultValues, nested: { nestedString: 'foo' } },
-      }),
-    )
-    const result2 = getPropsFromFieldDescription(description2)
+    const description2 = getFieldDescription({
+      name: 'conditional',
+      schema,
+      values: { ...defaultValues, nested: { nestedString: 'foo' } },
+    }) as yup.SchemaDescription
+    const result2 = getFieldPropsFromDescription({
+      name: 'conditional',
+      fieldDescription: description2,
+      values: { ...defaultValues, nested: { nestedString: 'foo' } },
+      context: {},
+    })
 
     expect(result2).toStrictEqual({
       ...toEqual,
@@ -328,21 +375,173 @@ describe('getFieldProps', () => {
     })
   })
 
-  it('returns empty object if field description is null', () => {
-    const result = getPropsFromFieldDescription(null)
-
-    expect(result).toStrictEqual({})
-  })
-
-  it('gets props from field path and schema description', () => {
-    const result = getPropsFromFieldPathAndSchemaDescription(
-      'nested.fields.nestedString',
-      schema.describe({ value: defaultValues }),
-    )
+  it('correctly evaluates refs and context in the schema', () => {
+    const result = getFieldProps({
+      name: 'refTest',
+      schema,
+      values: defaultValues,
+      context: { someContext: 10 },
+    })
 
     expect(result).toStrictEqual({
       type: 'string',
-      required: true,
+      required: false,
+      nullable: false,
+      oneOf: [],
+      notOneOf: [],
+      description: expect.any(Object),
+      tests: expect.any(Array),
+      max: 50,
+      min: 30,
+      length: 10,
+    })
+
+    const result2 = getFieldProps({
+      name: 'refTest',
+      schema,
+      values: {},
+      context: {},
+    })
+
+    expect(result2).toStrictEqual({
+      type: 'string',
+      required: false,
+      nullable: false,
+      oneOf: [],
+      notOneOf: [],
+      description: expect.any(Object),
+      tests: expect.any(Array),
+      max: undefined,
+      min: undefined,
+      length: undefined,
+    })
+  })
+
+  it('correctly evaluates refs in nested fields', () => {
+    const result = getFieldProps({
+      name: 'nested.nestedRef',
+      schema,
+      values: defaultValues,
+      context: { someContext: 10 },
+    })
+
+    expect(result).toStrictEqual({
+      type: 'string',
+      required: false,
+      nullable: false,
+      oneOf: [],
+      notOneOf: [],
+      description: expect.any(Object),
+      tests: expect.any(Array),
+      max: 60,
+      min: undefined,
+      length: 10,
+    })
+
+    const result2 = getFieldProps({
+      name: 'nested.nestedRef',
+      schema,
+      values: {},
+      context: {},
+    })
+
+    expect(result2).toStrictEqual({
+      type: 'string',
+      required: false,
+      nullable: false,
+      oneOf: [],
+      notOneOf: [],
+      description: expect.any(Object),
+      tests: expect.any(Array),
+      max: undefined,
+      min: undefined,
+      length: undefined,
+    })
+  })
+
+  it('correctly evaluates refs in oneOf', () => {
+    const result = getFieldProps({
+      name: 'oneOfRef',
+      schema,
+      values: defaultValues,
+      context: { someContext: 10 },
+    })
+
+    expect(result).toStrictEqual({
+      type: 'string',
+      required: false,
+      nullable: false,
+      oneOf: ['John', 'bla'],
+      notOneOf: [],
+      description: expect.any(Object),
+      tests: expect.any(Array),
+    })
+
+    const result2 = getFieldProps({
+      name: 'oneOfRef',
+      schema,
+      values: {},
+      context: {},
+    })
+
+    expect(result2).toStrictEqual({
+      type: 'string',
+      required: false,
+      nullable: false,
+      oneOf: [undefined, 'bla'],
+      notOneOf: [],
+      description: expect.any(Object),
+      tests: expect.any(Array),
+    })
+  })
+
+  it('correctly evaluates refs in notOneOf', () => {
+    const result = getFieldProps({
+      name: 'notOneOf',
+      schema,
+      values: defaultValues,
+      context: { someContext: 10 },
+    })
+
+    expect(result).toStrictEqual({
+      type: 'string',
+      required: false,
+      nullable: false,
+      oneOf: [],
+      notOneOf: ['John', 'five', 'six'],
+      description: expect.any(Object),
+      tests: expect.any(Array),
+    })
+
+    const result2 = getFieldProps({
+      name: 'notOneOf',
+      schema,
+      values: {},
+      context: {},
+    })
+
+    expect(result2).toStrictEqual({
+      type: 'string',
+      required: false,
+      nullable: false,
+      oneOf: [],
+      notOneOf: [undefined, 'five', 'six'],
+      description: expect.any(Object),
+      tests: expect.any(Array),
+    })
+  })
+
+  it('provides default props set when field does not exist', () => {
+    const result = getFieldProps({
+      name: 'nonExistentField',
+      schema,
+      values: defaultValues,
+      context: {},
+    })
+
+    expect(result).toStrictEqual({
+      type: 'mixed',
+      required: false,
       nullable: false,
       oneOf: [],
       notOneOf: [],
@@ -351,20 +550,15 @@ describe('getFieldProps', () => {
     })
   })
 
-  it('gets props from field name and schema description', () => {
-    const result = getPropsFromFieldNameAndSchemaDescription(
-      'nested.nestedString',
-      schema.describe({ value: defaultValues }),
-    )
-
-    expect(result).toStrictEqual({
-      type: 'string',
-      required: true,
-      nullable: false,
-      oneOf: [],
-      notOneOf: [],
-      description: expect.any(Object),
-      tests: expect.any(Array),
-    })
+  it('throws error when field does not exist and throwError is true', () => {
+    expect(() => {
+      getFieldProps({
+        name: 'nonExistentField',
+        schema,
+        values: defaultValues,
+        context: {},
+        throwError: true,
+      })
+    }).toThrow()
   })
 })
