@@ -1,4 +1,4 @@
-import { AnyObject, ObjectSchema, reach } from 'yup'
+import { AnyObject, ObjectSchema, reach, SchemaDescription } from 'yup'
 import { get } from 'lodash'
 import { throwOrReturn } from '../utils'
 
@@ -28,7 +28,8 @@ export const getFieldDescription = ({
     const value = get(parent, valuePath)
 
     const fieldSchema = reach(schema, name, values, context)
-    return fieldSchema.describe({ value, parent, context })
+    // TODO: Figure out why this type cast is necessary
+    return fieldSchema.describe({ value, parent, context }) as SchemaDescription
   } catch (error) {
     return throwOrReturn(error, throwError, null)
   }
@@ -59,7 +60,7 @@ export const getFieldDescriptionFromPaths = ({
       values,
       context,
     )
-    return fieldSchema.describe({ value, parent, context })
+    return fieldSchema.describe({ value, parent, context }) as SchemaDescription
   } catch (error) {
     return throwOrReturn(error, throwError, null)
   }
