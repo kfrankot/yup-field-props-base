@@ -58,12 +58,12 @@
     "rollup-plugin-license": "^3.5.2",
     "ts-jest": "^29.1.5",
     "typescript": "^5.5.3",
-    "yup": "^1.4.0"
+    "yup": "1.4.0"
   },
   "dependencies": {
     "lodash": "^4.17.21"
   },
   "peerDependencies": {
-    "yup": "^1.4.0"
+    "yup": "^1.0.0"
   }
 }

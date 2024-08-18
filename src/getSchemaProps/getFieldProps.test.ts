@@ -39,19 +39,28 @@ yup.number.prototype.isMidpoint = function (this: any, midpoint: number) {
 
 describe('getFieldPropsFromDescription', () => {
   const customTest = ['customTest', () => true] as const
+  const supportsDatetime = (yup.string() as any).datetime
+
+  let nameSchema = yup
+    .string()
+    .required()
+    .min(3)
+    .max(50)
+    .length(10)
+    .matches(/^[a-zA-Z]+$/, { excludeEmptyString: true })
+    .email()
+    .url()
+    .uuid()
+    .test(...customTest)
+  if (supportsDatetime) {
+    nameSchema = (nameSchema as any).datetime({
+      allowOffset: true,
+      precision: 2,
+    })
+  }
+
   const schema = yup.object().shape({
-    name: yup
-      .string()
-      .required()
-      .min(3)
-      .max(50)
-      .length(10)
-      .matches(/^[a-zA-Z]+$/, { excludeEmptyString: true })
-      .email()
-      .url()
-      .uuid()
-      .datetime({ allowOffset: true, precision: 2 })
-      .test(...customTest),
+    name: nameSchema,
     age: yup
       .number()
       .required()
@@ -131,16 +140,13 @@ describe('getFieldPropsFromDescription', () => {
       context: {},
     })
 
-    expect(result).toStrictEqual({
+    const props = {
       type: 'string',
       required: true,
       nullable: false,
       oneOf: [],
       notOneOf: [],
       customTest: true,
-      datetime: true,
-      datetimeAllowOffset: true,
-      datetimePrecision: 2,
       email: true,
       length: 10,
       matches: /^[a-zA-Z]+$/,
@@ -150,6 +156,18 @@ describe('getFieldPropsFromDescription', () => {
       uuid: true,
       description: expect.any(Object),
       tests: expect.any(Array),
+    }
+
+    const datetimeProps = supportsDatetime
+      ? {
+          datetime: true,
+          datetimeAllowOffset: true,
+          datetimePrecision: 2,
+        }
+      : {}
+    expect(result).toStrictEqual({
+      ...props,
+      ...datetimeProps,
     })
   })
 
