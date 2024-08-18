@@ -1,13 +1,13 @@
 # Yup Field Props Base
 
-Yup field props base is a library meant to simplify the collection of validation properties of a yup schema field, based on the current form state, so that the schema can be used as the single source of truth for assistive form UIs. Primarily meant to be used by `@yup-field-props/react`, rather than as a standalone.
+Yup field props base is a library meant to simplify the collection of validation properties of a yup schema field, based on the current form state, so that the schema can be used as the single source of truth for assistive form UIs. Primarily meant to be used by `yup-field-props-react`, rather than as a standalone.
 
 ## Installation
 
 To install the library, use npm or yarn:
 
 ```bash
-npm install @yup-field-props/base
+npm install yup-field-props-base
 ```
 
 # `getFieldProps` Function

@@ -1,5 +1,5 @@
 {
-  "name": "@yup-field-props/base",
+  "name": "yup-field-props-base",
   "version": "1.0.0-alpha.1",
   "description": "Get the validation properties for a field in a yup schema",
   "files": [
