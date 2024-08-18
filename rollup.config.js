@@ -2,6 +2,8 @@ import { babel } from '@rollup/plugin-babel'
 import includePaths from 'rollup-plugin-includepaths'
 import license from 'rollup-plugin-license'
 import terser from '@rollup/plugin-terser'
+import resolve from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
 
 const banner = `
 @preserve
@@ -15,7 +17,7 @@ export default [
       file: 'dist/index.js',
       format: 'es',
     },
-    external: ['yup', 'lodash/get'],
+    external: ['yup'],
     plugins: [
       license({
         banner,
@@ -23,6 +25,8 @@ export default [
       includePaths({
         extensions: ['.ts', '.js'],
       }),
+      resolve(),
+      commonjs(),
       babel({
         babelHelpers: 'runtime',
         exclude: 'node_modules/**',
