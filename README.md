@@ -35,7 +35,7 @@ The function returns an object containing the properties for the specified field
 Here is an example of how to use the `getFieldProps` function:
 
 ```typescript
-import { getFieldProps } from './getFieldProps'
+import { getFieldProps } from 'yup-field-props-base'
 import * as yup from 'yup'
 
 const schema = yup.object().shape({
