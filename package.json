@@ -23,7 +23,14 @@
     "prepack": "npm run build",
     "prepublishOnly": "npm run test:coverage"
   },
-  "keywords": ["yup", "field", "props", "validation", "schema", "describe"],
+  "keywords": [
+    "yup",
+    "field",
+    "props",
+    "validation",
+    "schema",
+    "describe"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/kfrankot/yup-field-props-base.git"

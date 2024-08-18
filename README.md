@@ -1,6 +1,6 @@
 # Yup Field Props Base
 
-Yup field props base is a library meant to simplify the collection of validation properties of a yup schema field, based on the current form state, so that the schema can be used as the single source of truth for assistive form UIs.  Primarily meant to be used by `@yup-field-props/react`, rather than as a standalone.
+Yup field props base is a library meant to simplify the collection of validation properties of a yup schema field, based on the current form state, so that the schema can be used as the single source of truth for assistive form UIs. Primarily meant to be used by `@yup-field-props/react`, rather than as a standalone.
 
 ## Installation
 
@@ -35,25 +35,29 @@ The function returns an object containing the properties for the specified field
 Here is an example of how to use the `getFieldProps` function:
 
 ```typescript
-import { getFieldProps } from './getFieldProps';
-import * as yup from 'yup';
+import { getFieldProps } from './getFieldProps'
+import * as yup from 'yup'
 
 const schema = yup.object().shape({
   name: yup.string().required('Name is required'),
-  age: yup.number().required('Age is required').min(13, 'You are not old enough').max(120, 'This is too old'),
+  age: yup
+    .number()
+    .required('Age is required')
+    .min(13, 'You are not old enough')
+    .max(120, 'This is too old'),
   email: yup.string().email().required(),
   username: yup.string().oneOf([yup.ref('name'), yup.ref('email')]),
   phoneNumber: yup.string().when('age', ([age], schema) => {
     return age >= 18 ? schema.required() : schema
-  })
-});
+  }),
+})
 
 const values = {
   name: 'Kevin',
   age: 20,
   email: 'test-email@gmail.com',
   username: 'test-email@gmail.com',
-  phoneNumber: '(123)-456-7890'
+  phoneNumber: '(123)-456-7890',
 }
 
 const ageProps = getFieldProps<NumberFieldProps>({
@@ -61,27 +65,27 @@ const ageProps = getFieldProps<NumberFieldProps>({
   schema,
   values: { name: '', age: '' },
   context: {},
-});
+})
 
 const usernameProps = getFieldProps<StringFieldProps>({
   name: 'username',
   schema,
   values,
   context: {},
-});
+})
 
 const phoneNumberProps = getFieldProps<StringFieldProps>({
   name: 'phoneNumber',
   schema,
   values,
   context: {},
-});
+})
 ```
 
 These props output the following
 
 ```typescript
-console.log(ageProps);
+console.log(ageProps)
 /*
 {
   type: 'number',
@@ -97,7 +101,7 @@ console.log(ageProps);
   max: 120
 }
 */
-console.log(usernameProps);
+console.log(usernameProps)
 /*
 {
   type: 'string',
@@ -108,7 +112,7 @@ console.log(usernameProps);
   tests: []
 }
 */
-console.log(phoneNumberProps);
+console.log(phoneNumberProps)
 /*
 {
   type: 'string',
@@ -119,4 +123,4 @@ console.log(phoneNumberProps);
   tests: [ { name: 'required', params: undefined } ]
 }
 */
-
+```
