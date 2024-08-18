@@ -23,14 +23,17 @@
     "prepack": "npm run build",
     "prepublishOnly": "npm run test:coverage"
   },
-  "keywords": [],
+  "keywords": ["yup", "field", "props", "validation", "schema", "describe"],
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/kfrankot/yup-field-props-base.git"
   },
   "author": "Kevin Frankot",
   "license": "MIT",
-  "homepage": "",
+  "bugs": {
+    "url": "https://github.com/kfrankot/yup-field-props-base/issues"
+  },
+  "homepage": "https://github.com/kfrankot/yup-field-props-base#readme",
   "devDependencies": {
     "@babel/plugin-transform-nullish-coalescing-operator": "^7.24.7",
     "@babel/plugin-transform-optional-chaining": "^7.24.7",
