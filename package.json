@@ -1,6 +1,6 @@
 {
   "name": "yup-field-props-base",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "Get the validation properties for a field in a yup schema",
   "files": [
     "dist/"
