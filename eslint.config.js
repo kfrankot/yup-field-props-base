@@ -52,6 +52,14 @@ export default [
     },
   },
 
+  {
+    // Override for test files
+    files: ['**/*.test.ts', '**/*.spec.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+
   // Prettier configuration
   {
     files: ['**/*.js', '**/*.ts', '**/*.tsx'],

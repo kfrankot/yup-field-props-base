@@ -4,7 +4,6 @@ module.exports = {
     '@babel/plugin-transform-runtime',
     '@babel/plugin-transform-nullish-coalescing-operator',
     '@babel/plugin-transform-optional-chaining',
-    'babel-plugin-lodash',
   ],
   env: {
     test: {

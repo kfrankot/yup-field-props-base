@@ -16,7 +16,7 @@
     "types:check": "tsc --project tsconfig.json",
     "format:check": "prettier \"**/*\" --check --ignore-unknown",
     "format:fix": "npm run format:check -- --write",
-    "lint": "eslint . --max-warnings 33",
+    "lint": "eslint . --max-warnings 17",
     "check": "npm run types:check && npm run format:check && npm run lint",
     "prebuild": "npm run check && npx rimraf -rf dist",
     "build": "tsc --project tsconfig.production.json && rollup --config",
@@ -57,7 +57,6 @@
     "@typescript-eslint/eslint-plugin": "^7.15.0",
     "@typescript-eslint/parser": "^7.15.0",
     "babel-jest": "^29.7.0",
-    "babel-plugin-lodash": "^3.3.4",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-jest": "^28.6.0",
@@ -69,11 +68,9 @@
     "rollup-plugin-includepaths": "^0.2.4",
     "rollup-plugin-license": "^3.5.2",
     "ts-jest": "^29.1.5",
+    "type-fest": "^4.25.0",
     "typescript": "^5.5.3",
     "yup": "^1.4.0"
-  },
-  "dependencies": {
-    "lodash": "^4.17.21"
   },
   "peerDependencies": {
     "yup": "^1.0.0"

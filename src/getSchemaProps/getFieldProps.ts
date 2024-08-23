@@ -4,12 +4,12 @@ import {
   ObjectSchema,
   AnyObject,
   mixed,
+  SchemaInnerTypeDescription,
 } from 'yup'
 import { AllFieldProps, FieldProps } from '../types'
 import { getValidationExtractionFuncByType } from '../extractors'
-import { get } from 'lodash'
 import { getFieldDescription } from './getFieldDescription'
-import { throwOrReturn } from '../utils'
+import { get, throwOrReturn } from '../utils'
 
 const isValidTest = (test: SchemaDescription['tests'][0]) => {
   return !!test.name
@@ -26,7 +26,7 @@ const resolveRef = ({
   param: any
   values: any
   name: string
-  context?: any
+  context?: AnyObject
 }) => {
   const isObject = param && typeof param === 'object'
   // check if object has all ref keys for class, or is a stump ref with type { type: 'ref', key: 'some.key' }
@@ -91,7 +91,7 @@ export const getFieldPropsFromDescription = <
   name: string
   fieldDescription: SchemaDescription
   values: any
-  context?: any
+  context?: AnyObject
   throwError?: boolean
 }) => {
   if (!fieldDescription && !throwError) {
@@ -136,8 +136,8 @@ export const getFieldPropsFromDescription = <
       const newProps = validatorExtractionFunc(test)
       // iterate over all props and resolve refs
       Object.keys(newProps).forEach((key) => {
-        ;(newProps as any)[key] = resolveRef({
-          param: (newProps as any)[key],
+        ;(newProps as Record<string, unknown>)[key] = resolveRef({
+          param: (newProps as Record<string, unknown>)[key],
           values,
           name,
           context,
@@ -175,11 +175,11 @@ export const getFieldPropsFromDescription = <
     })
 
     if (type === 'array') {
-      const of = (fieldDescription as any).innerType as SchemaDescription
-      if (of) {
+      const of = (fieldDescription as SchemaInnerTypeDescription).innerType
+      if (of && !Array.isArray(of)) {
         fieldProps.of = getFieldPropsFromDescription({
           name: name + '[]',
-          fieldDescription: of,
+          fieldDescription: of as SchemaDescription,
           values,
           context,
         })
@@ -202,7 +202,7 @@ export const getFieldProps = <T extends FieldProps = AllFieldProps>({
   name: string
   schema: ObjectSchema<any, AnyObject, any, ''>
   values: any
-  context?: any
+  context?: AnyObject
   throwError?: boolean
 }) => {
   const fieldDescription = getFieldDescription({

@@ -1,6 +1,5 @@
 import { AnyObject, ObjectSchema, reach, SchemaDescription } from 'yup'
-import { get } from 'lodash'
-import { throwOrReturn } from '../utils'
+import { get, throwOrReturn } from '../utils'
 
 export const getFieldPathsFromName = (name: string) => {
   const parts = name.split('.')
@@ -18,8 +17,8 @@ export const getFieldDescription = ({
 }: {
   name: string
   schema: ObjectSchema<any, AnyObject, any, ''>
-  values: AnyObject
-  context?: any
+  values: any
+  context?: AnyObject
   throwError?: boolean
 }) => {
   try {
@@ -46,8 +45,8 @@ export const getFieldDescriptionFromPaths = ({
   valuePath: string
   parentPath: string
   schema: ObjectSchema<any, AnyObject, any, ''>
-  values: AnyObject
-  context?: any
+  values: any
+  context?: AnyObject
   throwError?: boolean
 }) => {
   try {
