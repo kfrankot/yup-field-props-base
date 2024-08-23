@@ -23,7 +23,7 @@ The `getFieldProps` function takes a field name, a Yup schema, and other optiona
 - `name` (string): The name of the field for which properties are being generated.
 - `schema` (ObjectSchema): The Yup schema that defines the validation rules and properties for the field.
 - `values` (any): The current values of the form fields.
-- `context` (any, optional): Additional context that may be needed for validation.
+- `context` (AnyObject, optional): Additional context that may be needed for validation.
 - `throwError` (boolean, optional): Whether to throw an error or return default field properties in case of an error. Defaults to `false`.
 
 ## Return Value
@@ -32,12 +32,18 @@ The function returns an object containing the properties for the specified field
 
 ## Usage
 
-Here is an example of how to use the `getFieldProps` function:
+To use the `getFieldProps` function, follow these steps:
+
+1. Import the necessary modules:
 
 ```typescript
 import { getFieldProps } from 'yup-field-props-base'
 import * as yup from 'yup'
+```
 
+2. Define your Yup schema with the desired validation rules and properties:
+
+```typescript
 const schema = yup.object().shape({
   name: yup.string().required('Name is required'),
   age: yup
@@ -51,7 +57,11 @@ const schema = yup.object().shape({
     return age >= 18 ? schema.required() : schema
   }),
 })
+```
 
+3. Set the values for your form fields:
+
+```typescript
 const values = {
   name: 'Kevin',
   age: 20,
@@ -59,7 +69,11 @@ const values = {
   username: 'test-email@gmail.com',
   phoneNumber: '(123)-456-7890',
 }
+```
 
+4. Generate the field properties using the `getFieldProps` function:
+
+```typescript
 const ageProps = getFieldProps<NumberFieldProps>({
   name: 'age',
   schema,
@@ -82,11 +96,19 @@ const phoneNumberProps = getFieldProps<StringFieldProps>({
 })
 ```
 
-These props output the following
+5. Output the generated field properties:
 
 ```typescript
 console.log(ageProps)
-/*
+console.log(usernameProps)
+console.log(phoneNumberProps)
+```
+
+The console output will show the properties for each field based on the Yup schema.
+
+Example output:
+
+```typescript
 {
   type: 'number',
   required: true,
@@ -100,9 +122,7 @@ console.log(ageProps)
   min: 13,
   max: 120
 }
-*/
-console.log(usernameProps)
-/*
+
 {
   type: 'string',
   required: false,
@@ -111,9 +131,7 @@ console.log(usernameProps)
   notOneOf: [],
   tests: []
 }
-*/
-console.log(phoneNumberProps)
-/*
+
 {
   type: 'string',
   required: true,
@@ -122,5 +140,4 @@ console.log(phoneNumberProps)
   notOneOf: [],
   tests: [ { name: 'required', params: undefined } ]
 }
-*/
 ```
