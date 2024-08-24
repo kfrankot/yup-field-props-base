@@ -429,9 +429,6 @@ describe('getFieldPropsFromDescription', () => {
       notOneOf: [],
       description: expect.any(Object),
       tests: expect.any(Array),
-      max: undefined,
-      min: undefined,
-      length: undefined,
     })
   })
 
@@ -452,7 +449,6 @@ describe('getFieldPropsFromDescription', () => {
       description: expect.any(Object),
       tests: expect.any(Array),
       max: 60,
-      min: undefined,
       length: 10,
     })
 
@@ -471,9 +467,6 @@ describe('getFieldPropsFromDescription', () => {
       notOneOf: [],
       description: expect.any(Object),
       tests: expect.any(Array),
-      max: undefined,
-      min: undefined,
-      length: undefined,
     })
   })
 
@@ -578,5 +571,49 @@ describe('getFieldPropsFromDescription', () => {
         throwError: true,
       })
     }).toThrow()
+  })
+
+  it('self referential schema test', () => {
+    const schema = yup.object().shape({
+      minSize: yup.number().moreThan(1).lessThan(yup.ref('maxSize')).required(),
+      maxSize: yup.number().moreThan(yup.ref('minSize')).required(),
+    })
+
+    const values = { minSize: 5, maxSize: 100 }
+
+    const resultMinSize = getFieldProps({
+      name: 'minSize',
+      schema,
+      values,
+    })
+
+    const resultMaxSize = getFieldProps({
+      name: 'maxSize',
+      schema,
+      values,
+    })
+
+    expect(resultMinSize).toStrictEqual({
+      type: 'number',
+      required: true,
+      nullable: false,
+      oneOf: [],
+      notOneOf: [],
+      description: expect.any(Object),
+      tests: expect.any(Array),
+      lessThan: 100,
+      moreThan: 1,
+    })
+
+    expect(resultMaxSize).toStrictEqual({
+      type: 'number',
+      required: true,
+      nullable: false,
+      oneOf: [],
+      notOneOf: [],
+      description: expect.any(Object),
+      tests: expect.any(Array),
+      moreThan: 5,
+    })
   })
 })

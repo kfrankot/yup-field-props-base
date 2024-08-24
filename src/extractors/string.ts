@@ -1,17 +1,35 @@
-import { SchemaDescription } from 'yup'
+import { validNumberParam } from '../utils'
+import { ExtractorArgs } from './types'
+import { resolveRefForExtractor } from '../resolveRef'
 
-export const extractStringValidationFromTest = (
-  test: SchemaDescription['tests'][0],
-) => {
+export const extractStringValidationFromTest = ({
+  test,
+  values,
+  name,
+  context,
+}: ExtractorArgs) => {
   switch (test.name) {
     case 'min':
-      return test.params?.min ? { min: test.params.min as number } : {}
     case 'max':
-      return test.params?.max ? { max: test.params.max as number } : {}
     case 'length':
-      return test.params?.length ? { length: test.params.length as number } : {}
+      return resolveRefForExtractor({
+        param: test.params?.[test.name],
+        values,
+        name,
+        context,
+        key: test.name,
+        typeCheck: validNumberParam,
+        toStrictType: Number,
+      })
     case 'matches':
-      return test.params?.regex ? { matches: test.params.regex as RegExp } : {}
+      return resolveRefForExtractor({
+        param: test.params?.regex,
+        values,
+        name,
+        context,
+        key: 'matches',
+        typeCheck: (val) => val instanceof RegExp,
+      })
     case 'email':
       return { email: true }
     case 'url':
@@ -21,14 +39,25 @@ export const extractStringValidationFromTest = (
     case 'datetime':
       return { datetime: true }
     case 'datetime_offset':
-      return test.params?.allowOffset
-        ? { datetimeAllowOffset: test.params.allowOffset as boolean }
-        : {}
+      return resolveRefForExtractor({
+        param: test.params?.allowOffset,
+        values,
+        name,
+        context,
+        key: 'datetimeAllowOffset',
+        typeCheck: 'boolean',
+      })
     case 'datetime_precision':
-      return test.params?.precision
-        ? { datetimePrecision: test.params.precision as number }
-        : {}
+      return resolveRefForExtractor({
+        param: test.params?.precision,
+        values,
+        name,
+        context,
+        key: 'datetimePrecision',
+        typeCheck: validNumberParam,
+        toStrictType: Number,
+      })
     default:
-      return {}
+      return null
   }
 }

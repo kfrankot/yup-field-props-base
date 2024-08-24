@@ -36,3 +36,17 @@ export const get = <
   }
   return iterateObject as Get<TObject, TPath>
 }
+
+export const validNumberParam = (value: unknown) => {
+  if (
+    typeof value === 'number' &&
+    !Number.isNaN(value) &&
+    Number.isFinite(value)
+  ) {
+    return true
+  }
+  if (typeof value === 'string' && !Number.isNaN(Number(value))) {
+    return true
+  }
+  return false
+}

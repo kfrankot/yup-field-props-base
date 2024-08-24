@@ -1,37 +1,63 @@
-import { SchemaDescription } from 'yup'
+import { validNumberParam } from '../utils'
+import { resolveRefForExtractor } from '../resolveRef'
+import { ExtractorArgs } from './types'
 
-const validNumberParam = (value: unknown) =>
-  typeof value === 'number' && !Number.isNaN(value) && Number.isFinite(value)
-
-export const extractNumberValidationFromTest = (
-  test: SchemaDescription['tests'][0],
-) => {
+export const extractNumberValidationFromTest = ({
+  test,
+  values,
+  name,
+  context,
+}: ExtractorArgs) => {
   switch (test.name) {
     case 'min':
       if (test.params?.min !== undefined) {
-        return validNumberParam(test.params?.min)
-          ? { min: test.params?.min as number }
-          : {}
+        return resolveRefForExtractor({
+          param: test.params.min,
+          values,
+          name,
+          context,
+          key: 'min',
+          typeCheck: validNumberParam,
+          toStrictType: Number,
+        })
       } else if (test.params?.more !== undefined) {
-        return validNumberParam(test.params?.more)
-          ? { moreThan: test.params?.more as number }
-          : {}
+        return resolveRefForExtractor({
+          param: test.params.more,
+          values,
+          name,
+          context,
+          key: 'moreThan',
+          typeCheck: validNumberParam,
+          toStrictType: Number,
+        })
       }
       return {}
     case 'max':
       if (test.params?.max !== undefined) {
-        return validNumberParam(test.params?.max)
-          ? { max: test.params?.max as number }
-          : {}
+        return resolveRefForExtractor({
+          param: test.params.max,
+          values,
+          name,
+          context,
+          key: 'max',
+          typeCheck: validNumberParam,
+          toStrictType: Number,
+        })
       } else if (test.params?.less !== undefined) {
-        return validNumberParam(test.params?.less)
-          ? { lessThan: test.params?.less as number }
-          : {}
+        return resolveRefForExtractor({
+          param: test.params.less,
+          values,
+          name,
+          context,
+          key: 'lessThan',
+          typeCheck: validNumberParam,
+          toStrictType: Number,
+        })
       }
       return {}
     case 'integer':
       return { integer: true }
     default:
-      return {}
+      return null
   }
 }

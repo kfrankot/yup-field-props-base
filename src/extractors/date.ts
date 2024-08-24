@@ -1,18 +1,29 @@
-import { SchemaDescription } from 'yup'
+import { resolveRef } from '../resolveRef'
+import { ExtractorArgs } from './types'
 
-export const extractDateValidationFromTest = (
-  test: SchemaDescription['tests'][0],
-) => {
+const isValidDate = (date: Date) => {
+  return date instanceof Date && !isNaN(date.getTime())
+}
+
+export const extractDateValidationFromTest = ({
+  test,
+  values,
+  name,
+  context,
+}: ExtractorArgs) => {
   switch (test.name) {
     case 'min':
-      return test.params?.min
-        ? { min: new Date(test.params?.min as string) }
-        : {}
-    case 'max':
-      return test.params?.max
-        ? { max: new Date(test.params?.max as string) }
-        : {}
+    case 'max': {
+      const value = resolveRef({
+        param: test.params?.[test.name],
+        values,
+        name,
+        context,
+      })
+      const date = new Date(value)
+      return isValidDate(date) ? { [test.name]: date } : {}
+    }
     default:
-      return {}
+      return null
   }
 }

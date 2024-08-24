@@ -1,16 +1,27 @@
-import { SchemaDescription } from 'yup'
+import { ExtractorArgs } from './types'
+import { resolveRefForExtractor } from '../resolveRef'
+import { validNumberParam } from '../utils'
 
-export const extractArrayValidationFromTest = (
-  test: SchemaDescription['tests'][0],
-) => {
+export const extractArrayValidationFromTest = ({
+  test,
+  values,
+  name,
+  context,
+}: ExtractorArgs) => {
   switch (test.name) {
     case 'min':
-      return test.params?.min ? { min: test.params.min as number } : {}
     case 'max':
-      return test.params?.max ? { max: test.params.max as number } : {}
     case 'length':
-      return test.params?.length ? { length: test.params.length as number } : {}
+      return resolveRefForExtractor({
+        param: test.params?.[test.name],
+        values,
+        name,
+        context,
+        key: test.name,
+        typeCheck: validNumberParam,
+        toStrictType: Number,
+      })
     default:
-      return {}
+      return null
   }
 }

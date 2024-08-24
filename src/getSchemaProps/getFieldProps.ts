@@ -1,6 +1,5 @@
 import {
   SchemaDescription,
-  Reference,
   ObjectSchema,
   AnyObject,
   mixed,
@@ -9,62 +8,11 @@ import {
 import { AllFieldProps, FieldProps } from '../types'
 import { getValidationExtractionFuncByType } from '../extractors'
 import { getFieldDescription } from './getFieldDescription'
-import { get, throwOrReturn } from '../utils'
+import { throwOrReturn } from '../utils'
+import { resolveRef } from '../resolveRef'
 
 const isValidTest = (test: SchemaDescription['tests'][0]) => {
   return !!test.name
-}
-
-const refKeys = ['key', 'isContext', 'isValue', 'isSibling', 'path']
-
-const resolveRef = ({
-  param,
-  values,
-  name,
-  context,
-}: {
-  param: any
-  values: any
-  name: string
-  context?: AnyObject
-}) => {
-  const isObject = param && typeof param === 'object'
-  // check if object has all ref keys for class, or is a stump ref with type { type: 'ref', key: 'some.key' }
-  const hasRefKeys = isObject
-    ? refKeys.every((key) => Object.hasOwn(param, key))
-    : false
-  const isBasicRef =
-    isObject &&
-    (param.type === 'ref' ||
-      (hasRefKeys && typeof (param as Reference).getValue !== 'function'))
-  const isRefClass =
-    hasRefKeys && typeof (param as Reference).getValue === 'function'
-
-  if (isRefClass) {
-    try {
-      const reference = param as Reference
-      let parent
-      if (reference.isContext) {
-        parent = values
-      } else {
-        const parentPath = name.split('.').slice(0, -1).join('.')
-        parent = parentPath ? get(values, parentPath) : values
-      }
-      return reference.getValue(values, parent, context)
-    } catch (err) {
-      console.debug('Error parsing ref class, fallback on undefined', err)
-      return undefined
-    }
-  } else if (isBasicRef) {
-    try {
-      const reference = param as Reference
-      return get(values, reference.path || reference.key)
-    } catch (err) {
-      console.debug('Error parsing basic ref, fallback on undefined', err)
-      return undefined
-    }
-  }
-  return param
 }
 
 const getDefaultFieldProps = (): FieldProps => {
@@ -128,23 +76,21 @@ export const getFieldPropsFromDescription = <
 
     const validatorExtractionFunc = getValidationExtractionFuncByType(type)
 
-    if (!validatorExtractionFunc) return fieldProps
+    if (!validatorExtractionFunc) return fieldProps as T
 
     const customTests: SchemaDescription['tests'] = []
     fieldDescription.tests.forEach((test) => {
       if (!isValidTest(test)) return
-      const newProps = validatorExtractionFunc(test)
-      // iterate over all props and resolve refs
-      Object.keys(newProps).forEach((key) => {
-        ;(newProps as Record<string, unknown>)[key] = resolveRef({
-          param: (newProps as Record<string, unknown>)[key],
-          values,
-          name,
-          context,
-        })
+      const newProps = validatorExtractionFunc({
+        name,
+        test,
+        values,
+        context,
       })
-      Object.assign(fieldProps, newProps)
-      if (Object.keys(newProps).length === 0) {
+      newProps && Object.assign(fieldProps, newProps)
+      // null for test that is unhandled by the validatorExtractionFunc, likely a custom test
+      // defined by another developer
+      if (newProps === null) {
         customTests.push(test)
       }
     })

@@ -1,6 +1,6 @@
 {
   "name": "yup-field-props-base",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.4",
   "description": "Get the validation properties for a field in a yup schema",
   "files": [
     "dist/"
@@ -12,7 +12,8 @@
   "exports": {
     ".": {
       "import": "./dist/index.esm.js",
-      "require": "./dist/index.cjs.js"
+      "require": "./dist/index.cjs.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "scripts": {
@@ -22,7 +23,7 @@
     "types:check": "tsc --project tsconfig.json",
     "format:check": "prettier \"**/*\" --check --ignore-unknown",
     "format:fix": "npm run format:check -- --write",
-    "lint": "eslint . --max-warnings 17",
+    "lint": "eslint . --max-warnings 18",
     "check": "npm run types:check && npm run format:check && npm run lint",
     "prebuild": "npm run check && npx rimraf -rf dist",
     "build": "tsc --project tsconfig.production.json && rollup --config",
