@@ -1,14 +1,20 @@
 {
   "name": "yup-field-props-base",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "Get the validation properties for a field in a yup schema",
   "files": [
     "dist/"
   ],
   "type": "module",
-  "main": "dist/index.js",
-  "module": "dist/index.ts",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs.js"
+    }
+  },
   "scripts": {
     "test": "jest --runInBand",
     "test:watch": "npm run test -- --watch",
