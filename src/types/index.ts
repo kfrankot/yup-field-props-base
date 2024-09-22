@@ -53,4 +53,5 @@ export type StringFieldProps = FieldProps & {
 export type AllFieldProps = MixedFieldProps &
   NumberFieldProps &
   DateFieldProps &
-  ArrayFieldProps
+  ArrayFieldProps &
+  StringFieldProps
