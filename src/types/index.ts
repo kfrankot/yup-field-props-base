@@ -1,6 +1,6 @@
 import { SchemaDescription } from 'yup'
 
-export type FieldProps = {
+export interface FieldProps {
   type: string
   required: boolean
   nullable: boolean
@@ -14,9 +14,9 @@ export type FieldProps = {
   }[]
 }
 
-export type MixedFieldProps = FieldProps
+export interface MixedFieldProps extends FieldProps {}
 
-export type NumberFieldProps = FieldProps & {
+export interface NumberFieldProps extends FieldProps {
   min?: number
   max?: number
   lessThan?: number
@@ -24,12 +24,13 @@ export type NumberFieldProps = FieldProps & {
   integer?: boolean
 }
 
-export type DateFieldProps = FieldProps & {
+export interface DateFieldProps extends FieldProps {
   min?: Date
   max?: Date
 }
 
-export type ArrayFieldProps<Of extends FieldProps = FieldProps> = FieldProps & {
+export interface ArrayFieldProps<Of extends FieldProps = FieldProps>
+  extends FieldProps {
   of?: Of
   min?: number
   max?: number
@@ -37,7 +38,7 @@ export type ArrayFieldProps<Of extends FieldProps = FieldProps> = FieldProps & {
   ensure?: boolean
 }
 
-export type StringFieldProps = FieldProps & {
+export interface StringFieldProps extends FieldProps {
   min?: number
   max?: number
   length?: number
