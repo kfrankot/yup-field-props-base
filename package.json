@@ -1,6 +1,6 @@
 {
   "name": "yup-field-props-base",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0",
   "description": "Get the validation properties for a field in a yup schema",
   "files": [
     "dist/"
@@ -60,7 +60,6 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@testing-library/jest-dom": "^6.4.8",
     "@types/jest": "^29.5.12",
-    "@types/lodash": "^4.17.7",
     "@typescript-eslint/eslint-plugin": "^7.15.0",
     "@typescript-eslint/parser": "^7.15.0",
     "babel-jest": "^29.7.0",
